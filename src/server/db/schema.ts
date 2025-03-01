@@ -39,6 +39,7 @@ export const assets = createTable(
   "assets",
   {
     id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
+    orgId: varchar("org_id", { length: 256 }),
     name: varchar("name", { length: 256 }),
     serialNumber: varchar("serial_number", { length: 256 }),
     modelId: integer("model_id").references(() => models.id),
@@ -57,6 +58,7 @@ export const models = createTable(
   "models",
   {
     id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
+    orgId: varchar("org_id", { length: 256 }),
     name: varchar("name", { length: 256 }),
     createdAt: timestamp("created_at", { withTimezone: true })
       .default(sql`CURRENT_TIMESTAMP`)
