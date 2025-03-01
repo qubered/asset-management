@@ -7,7 +7,7 @@ import { ClerkThemeWrapper } from "@/components/themes/clerk-theme-wrapper";
 export const metadata: Metadata = {
   title: "Theatre Asset Management",
   description: "Theatre focused asset management system",
-  icons: [{ rel: "icon", url: "/favicon.ico" }],
+  icons: [{ rel: "icon", url: "/database.png" }],
 };
 
 export default function RootLayout({
