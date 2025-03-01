@@ -3,6 +3,7 @@
 import {
   ChevronsUpDown,
   LogOut,
+  Building,
 } from "lucide-react"
 
 import {
@@ -18,6 +19,10 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuPortal,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
 } from "@/components/ui/dropdown-menu"
 import {
   SidebarMenu,
@@ -27,17 +32,26 @@ import {
 } from "@/components/ui/sidebar"
 
 import { useTheme } from "next-themes"
-import type { UserResource } from "@clerk/types"
+import type { UserResource, OrganizationResource } from "@clerk/types"
 import {
   SignOutButton,
   useClerk,
+  useOrganizationList,
+  useOrganization,
 } from "@clerk/nextjs"
 import { SimpleThemeButton } from "@/components/themes/simple-theme-button"
+import { useState } from "react"
 export function NavUser({ user }: { user: UserResource }) {
   const { isMobile } = useSidebar()
   const { theme, setTheme } = useTheme()
   const { openUserProfile } = useClerk()
-
+  const [activeOrganization, setActiveOrganization] = useState<OrganizationResource | null>(null)
+  const { userMemberships } = useOrganizationList({
+    userMemberships: {
+      infinite: true,
+    }
+  });
+  const { organization } = useOrganization()
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -87,26 +101,37 @@ export function NavUser({ user }: { user: UserResource }) {
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              {/* <DropdownMenuItem>
-                <Sparkles className="h-4 w-4" />
-                Upgrade to Pro
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <CreditCard />
-                Billing
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Bell />
-                Notifications
-              </DropdownMenuItem> */}
               <DropdownMenuItem onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>
                 <SimpleThemeButton />
                 {theme === "dark" ? "Light Mode" : "Dark Mode"}
               </DropdownMenuItem>
             </DropdownMenuGroup>
+            <DropdownMenuSeparator />
+            <DropdownMenuSub>
+              <DropdownMenuSubTrigger>
+                <Building className="h-4 w-4" />
+                <span>{organization?.name || "Organizations"}</span>
+              </DropdownMenuSubTrigger>
+              <DropdownMenuPortal>
+                <DropdownMenuSubContent>
+                  {userMemberships?.data?.map((membership) => (
+                    <DropdownMenuItem
+                      key={membership.organization.id}
+                      className={activeOrganization?.id === membership.organization.id ? "bg-accent" : ""}
+                      onClick={() => setActiveOrganization(membership.organization)}
+                    >
+                      <Avatar className="h-4 w-4 rounded-sm">
+                        <AvatarImage src={membership.organization.imageUrl} alt={membership.organization.name} />
+                        <AvatarFallback className="rounded-full">
+                          {membership.organization.name.charAt(0)}
+                        </AvatarFallback>
+                      </Avatar>
+                      {membership.organization.name}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuSubContent>
+              </DropdownMenuPortal>
+            </DropdownMenuSub>
             <DropdownMenuSeparator />
             <DropdownMenuItem>
               <SignOutButton>

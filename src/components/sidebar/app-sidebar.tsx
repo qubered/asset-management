@@ -7,7 +7,6 @@ import {
 import Link from "next/link"
 import { NavUser } from "@/components/sidebar/nav-user"
 import { useUser } from "@clerk/nextjs"
-import { usePathname } from "next/navigation"
 import {
   Sidebar,
   SidebarContent,
@@ -19,15 +18,15 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarRail,
 } from "@/components/ui/sidebar"
+import { usePathname } from "next/navigation"
 
 // This is sample data.
 const data = {
   navMain: [
     {
       title: "Main",
-      url: "$",
+      url: "/main",
       items: [
         {
           title: "Assets",
@@ -49,14 +48,13 @@ const data = {
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { user } = useUser()
   const pathname = usePathname()
-
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton size="lg" asChild>
-              <a href="#">
+            <SidebarMenuButton size="lg" asChild isActive={pathname === "/main"}>
+              <Link href="/main">
                 <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
                   <Database className="size-4" />
                 </div>
@@ -64,7 +62,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   <span className="font-semibold">Asset Management</span>
                   <span className="">v0.0.1</span>
                 </div>
-              </a>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
@@ -77,10 +75,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               <SidebarMenu>
                 {item.items.map((item) => (
                   <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton
-                      asChild
-                      isActive={pathname === item.url}
-                    >
+                    <SidebarMenuButton asChild isActive={pathname === item.url}>
                       <Link href={item.url}>{item.title}</Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -93,7 +88,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarFooter>
         {user && <NavUser user={user} />}
       </SidebarFooter>
-      <SidebarRail />
     </Sidebar>
   )
 }
