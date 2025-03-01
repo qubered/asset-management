@@ -41,9 +41,23 @@ export const assets = createTable(
     id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
     name: varchar("name", { length: 256 }),
     serialNumber: varchar("serial_number", { length: 256 }),
-    model: varchar("model", { length: 256 }),
+    modelId: integer("model_id").references(() => models.id),
     location: varchar("location", { length: 256 }),
     category: varchar("category", { length: 256 }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).$onUpdate(
+      () => new Date()
+    ),
+  }
+);
+
+export const models = createTable(
+  "models",
+  {
+    id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
+    name: varchar("name", { length: 256 }),
     createdAt: timestamp("created_at", { withTimezone: true })
       .default(sql`CURRENT_TIMESTAMP`)
       .notNull(),

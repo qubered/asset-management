@@ -7,6 +7,7 @@ import {
 import Link from "next/link"
 import { NavUser } from "@/components/sidebar/nav-user"
 import { useUser } from "@clerk/nextjs"
+import { usePathname } from "next/navigation"
 import {
   Sidebar,
   SidebarContent,
@@ -26,16 +27,15 @@ const data = {
   navMain: [
     {
       title: "Main",
-      url: "#",
+      url: "$",
       items: [
         {
           title: "Assets",
-          url: "#",
-          isActive: true,
+          url: "/main/assets",
         },
         {
           title: "Models",
-          url: "#",
+          url: "/main/models",
         },
         {
           title: "Locations",
@@ -48,6 +48,8 @@ const data = {
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { user } = useUser()
+  const pathname = usePathname()
+
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
@@ -75,7 +77,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               <SidebarMenu>
                 {item.items.map((item) => (
                   <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild isActive={item.isActive}>
+                    <SidebarMenuButton
+                      asChild
+                      isActive={pathname === item.url}
+                    >
                       <Link href={item.url}>{item.title}</Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
