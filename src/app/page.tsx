@@ -21,11 +21,9 @@ export default function HomePage() {
             <p className="text-lg">Theatre focused asset management system</p>
             <p className="text-lg text-muted-foreground">Built by theatre people</p>
           </div>
+          <Link href="/login" className={buttonVariants({ variant: "default" })}>Get Started</Link>
         </div>
-        <Link href="/login" className={buttonVariants({ variant: "default" })}>Get Started</Link>
       </div>
-
-
     </main>
   );
 }
