@@ -5,13 +5,15 @@ import {
     SidebarInset,
     SidebarProvider,
 } from "@/components/ui/sidebar"
+import { auth } from '@clerk/nextjs/server'
 
 
 interface MainLayoutProps {
     children: React.ReactNode
 }
 
-export default function MainLayout({ children }: MainLayoutProps) {
+export default async function MainLayout({ children }: MainLayoutProps) {
+    await auth.protect()
     return (
         <SidebarProvider>
             <AppSidebar />
