@@ -4,7 +4,7 @@ import * as React from "react"
 import {
   Database,
 } from "lucide-react"
-
+import Link from "next/link"
 import { NavUser } from "@/components/sidebar/nav-user"
 import { useUser } from "@clerk/nextjs"
 import {
@@ -182,7 +182,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 {item.items.map((item) => (
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton asChild isActive={item.isActive}>
-                      <a href={item.url}>{item.title}</a>
+                      <Link href={item.url}>{item.title}</Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 ))}
