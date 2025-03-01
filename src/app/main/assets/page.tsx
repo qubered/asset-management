@@ -1,7 +1,7 @@
 import { db } from "@/server/db"
 import { auth } from '@clerk/nextjs/server'
 import { eq } from "drizzle-orm"
-import { assets } from "@/server/db/schema"
+import { assets, models } from "@/server/db/schema"
 
 export default async function MainPage() {
     const { orgId } = await auth()
@@ -12,7 +12,9 @@ export default async function MainPage() {
     const assetsRes = await db.query.assets.findMany({
         where: eq(assets.orgId, orgId)
     })
-    const modelsResult = await db.query.models.findMany()
+    const modelsResult = await db.query.models.findMany({
+        where: eq(models.orgId, orgId)
+    })
     return (
         <div>
             <h1 className="text-2xl font-bold">Assets</h1>

@@ -1,8 +1,19 @@
 import { db } from "@/server/db"
+import { auth } from "@clerk/nextjs/server"
+import { eq } from "drizzle-orm"
+import { assets, models } from "@/server/db/schema"
 
 export default async function ModelsPage() {
-    const assets = await db.query.assets.findMany()
-    const models = await db.query.models.findMany()
+    const { orgId } = await auth()
+    if (!orgId) {
+        return <div>No organization selected</div>
+    }
+    const assetsRes = await db.query.assets.findMany({
+        where: eq(assets.orgId, orgId)
+    })
+    const modelsRes = await db.query.models.findMany({
+        where: eq(models.orgId, orgId)
+    })
     return (
         <div>
             <h1 className="text-2xl font-bold">Models</h1>
@@ -17,8 +28,8 @@ export default async function ModelsPage() {
                     </tr>
                 </thead>
                 <tbody>
-                    {models.map((model) => {
-                        const modelAssets = assets.filter(asset => asset.modelId === model.id)
+                    {modelsRes.map((model) => {
+                        const modelAssets = assetsRes.filter(asset => asset.modelId === model.id)
                         return (
                             <tr key={model.id}>
                                 <td className="border px-4 py-2 font-bold">{model.id}</td>
