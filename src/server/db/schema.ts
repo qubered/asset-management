@@ -18,8 +18,43 @@ import {
  */
 export const createTable = pgTableCreator((name) => `asset-management_${name}`);
 
-export const posts = createTable(
-  "post",
+// export const posts = createTable(
+//   "post",
+//   {
+//     id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
+//     name: varchar("name", { length: 256 }),
+//     createdAt: timestamp("created_at", { withTimezone: true })
+//       .default(sql`CURRENT_TIMESTAMP`)
+//       .notNull(),
+//     updatedAt: timestamp("updated_at", { withTimezone: true }).$onUpdate(
+//       () => new Date()
+//     ),
+//   },
+//   (example) => ({
+//     nameIndex: index("name_idx").on(example.name),
+//   })
+// );
+
+export const assets = createTable(
+  "assets",
+  {
+    id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
+    name: varchar("name", { length: 256 }),
+    serialNumber: varchar("serial_number", { length: 256 }),
+    modelId: integer("model_id").references(() => models.id),
+    location: varchar("location", { length: 256 }),
+    category: varchar("category", { length: 256 }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).$onUpdate(
+      () => new Date()
+    ),
+  }
+);
+
+export const models = createTable(
+  "models",
   {
     id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
     name: varchar("name", { length: 256 }),
@@ -29,8 +64,5 @@ export const posts = createTable(
     updatedAt: timestamp("updated_at", { withTimezone: true }).$onUpdate(
       () => new Date()
     ),
-  },
-  (example) => ({
-    nameIndex: index("name_idx").on(example.name),
-  })
+  }
 );
