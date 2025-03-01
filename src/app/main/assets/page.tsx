@@ -2,7 +2,7 @@ import { db } from "@/server/db"
 
 export default async function MainPage() {
     const assets = await db.query.assets.findMany()
-    const models = await db.query.models.findMany()
+    const modelsResult = await db.query.models.findMany()
     return (
         <div>
             <h1 className="text-2xl font-bold">Assets</h1>
@@ -23,7 +23,7 @@ export default async function MainPage() {
                             <td className="border px-4 py-2">{asset.name}</td>
                             <td className="border px-4 py-2">{asset.location}</td>
                             <td className="border px-4 py-2">{asset.category}</td>
-                            <td className="border px-4 py-2">{models.find((model) => model.id === asset.modelId)?.name}</td>
+                            <td className="border px-4 py-2">{modelsResult.find((model) => model.id === asset.modelId)?.name}</td>
                         </tr>
                     ))}
                 </tbody>
