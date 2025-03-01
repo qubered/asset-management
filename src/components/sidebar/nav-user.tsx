@@ -4,6 +4,7 @@ import {
   ChevronsUpDown,
   LogOut,
   Building,
+  Plus,
 } from "lucide-react"
 
 import {
@@ -36,6 +37,7 @@ import type { UserResource, OrganizationResource } from "@clerk/types"
 import {
   SignOutButton,
   useClerk,
+  useOrganization,
   useOrganizationList,
 } from "@clerk/nextjs"
 import { SimpleThemeButton } from "@/components/themes/simple-theme-button"
@@ -46,33 +48,13 @@ import Cookies from "js-cookie"
 export function NavUser({ user }: { user: UserResource }) {
   const { isMobile } = useSidebar()
   const { theme, setTheme } = useTheme()
-  const { openUserProfile } = useClerk()
-  const [activeOrganization, setActiveOrganization] = useState<OrganizationResource | null>(null)
+  const { openUserProfile, openCreateOrganization, setActive, openOrganizationProfile } = useClerk()
+  const { organization } = useOrganization()
   const { userMemberships } = useOrganizationList({
     userMemberships: {
       infinite: true,
     }
   });
-
-  useEffect(() => {
-    const savedOrgId = (Cookies.get('activeOrganizationId') as string | undefined) || ''
-    if (savedOrgId && userMemberships?.data) {
-      const savedOrg = userMemberships.data.find(
-        membership => membership.organization.id === savedOrgId
-      )
-      if (savedOrg) {
-        setActiveOrganization(savedOrg.organization)
-      }
-    }
-  }, [userMemberships?.data])
-
-  const handleOrganizationChange = (organization: OrganizationResource) => {
-    setActiveOrganization(organization)
-    Cookies.set('activeOrganizationId', organization.id, { expires: 365 })
-    toast.success(`Changed Organization`, {
-      description: `You are now viewing ${organization.name}`
-    })
-  }
 
   return (
     <SidebarMenu>
@@ -130,26 +112,31 @@ export function NavUser({ user }: { user: UserResource }) {
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuSub>
-              <DropdownMenuSubTrigger>
-                {activeOrganization ? (
+              <DropdownMenuSubTrigger onClick={() => openOrganizationProfile()}>
+                {organization ? (
                   <Avatar className="h-4 w-4 rounded-sm">
-                    <AvatarImage src={activeOrganization.imageUrl} alt={activeOrganization.name} />
+                    <AvatarImage src={organization.imageUrl} alt={organization.name} />
                     <AvatarFallback className="rounded-sm">
-                      {activeOrganization.name.charAt(0)}
+                      {organization.name.charAt(0)}
                     </AvatarFallback>
                   </Avatar>
                 ) : (
                   <Building className="h-4 w-4" />
                 )}
-                <span>{activeOrganization?.name ?? "Organizations"}</span>
+                <span>{organization?.name ?? "Organizations"}</span>
               </DropdownMenuSubTrigger>
               <DropdownMenuPortal>
                 <DropdownMenuSubContent>
                   {userMemberships?.data?.map((membership) => (
                     <DropdownMenuItem
                       key={membership.organization.id}
-                      className={activeOrganization?.id === membership.organization.id ? "bg-accent" : ""}
-                      onClick={() => handleOrganizationChange(membership.organization)}
+                      className={organization?.id === membership.organization.id ? "bg-accent" : ""}
+                      onClick={async () => {
+                        await setActive({ organization: membership.organization.id })
+                        toast.success(`Changed Organization`, {
+                          description: `You are now in ${membership.organization.name}`
+                        })
+                      }}
                     >
                       <Avatar className="h-4 w-4 rounded-sm">
                         <AvatarImage src={membership.organization.imageUrl} alt={membership.organization.name} />
@@ -160,6 +147,11 @@ export function NavUser({ user }: { user: UserResource }) {
                       {membership.organization.name}
                     </DropdownMenuItem>
                   ))}
+                  <DropdownMenuItem onClick={() => openCreateOrganization()}>
+                    <Plus className="h-4 w-4" />
+                    Create New Organization
+                  </DropdownMenuItem>
+
                 </DropdownMenuSubContent>
               </DropdownMenuPortal>
             </DropdownMenuSub>
