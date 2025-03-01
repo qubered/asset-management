@@ -4,15 +4,19 @@ import { eq } from "drizzle-orm"
 import { assets } from "@/server/db/schema"
 
 export default async function MainPage() {
-    const user = await auth();
+    const { orgId } = await auth()
+    if (!orgId) {
+        return <div>No organization selected</div>
+    }
+
     const assetsRes = await db.query.assets.findMany({
-        where: eq(assets.orgId, user?.orgId as string)
+        where: eq(assets.orgId, orgId)
     })
     const modelsResult = await db.query.models.findMany()
     return (
         <div>
             <h1 className="text-2xl font-bold">Assets</h1>
-            {user?.orgId}
+            {orgId}
             <table>
                 <thead>
                     <tr>

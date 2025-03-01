@@ -33,7 +33,7 @@ import {
 } from "@/components/ui/sidebar"
 
 import { useTheme } from "next-themes"
-import type { UserResource, OrganizationResource } from "@clerk/types"
+import type { UserResource } from "@clerk/types"
 import {
   SignOutButton,
   useClerk,
@@ -42,8 +42,6 @@ import {
 } from "@clerk/nextjs"
 import { SimpleThemeButton } from "@/components/themes/simple-theme-button"
 import { toast } from "sonner"
-import { useEffect, useState } from "react"
-import Cookies from "js-cookie"
 
 export function NavUser({ user }: { user: UserResource }) {
   const { isMobile } = useSidebar()
