@@ -37,10 +37,12 @@ import {
   SignOutButton,
   useClerk,
   useOrganizationList,
-  useOrganization,
 } from "@clerk/nextjs"
 import { SimpleThemeButton } from "@/components/themes/simple-theme-button"
-import { useState } from "react"
+import { toast } from "sonner"
+import { useEffect, useState } from "react"
+import Cookies from "js-cookie"
+
 export function NavUser({ user }: { user: UserResource }) {
   const { isMobile } = useSidebar()
   const { theme, setTheme } = useTheme()
@@ -51,7 +53,27 @@ export function NavUser({ user }: { user: UserResource }) {
       infinite: true,
     }
   });
-  const { organization } = useOrganization()
+
+  useEffect(() => {
+    const savedOrgId = (Cookies.get('activeOrganizationId') as string | undefined) || ''
+    if (savedOrgId && userMemberships?.data) {
+      const savedOrg = userMemberships.data.find(
+        membership => membership.organization.id === savedOrgId
+      )
+      if (savedOrg) {
+        setActiveOrganization(savedOrg.organization)
+      }
+    }
+  }, [userMemberships?.data])
+
+  const handleOrganizationChange = (organization: OrganizationResource) => {
+    setActiveOrganization(organization)
+    Cookies.set('activeOrganizationId', organization.id, { expires: 365 })
+    toast.success(`Changed Organization`, {
+      description: `You are now viewing ${organization.name}`
+    })
+  }
+
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -109,8 +131,17 @@ export function NavUser({ user }: { user: UserResource }) {
             <DropdownMenuSeparator />
             <DropdownMenuSub>
               <DropdownMenuSubTrigger>
-                <Building className="h-4 w-4" />
-                <span>{organization?.name || "Organizations"}</span>
+                {activeOrganization ? (
+                  <Avatar className="h-4 w-4 rounded-sm">
+                    <AvatarImage src={activeOrganization.imageUrl} alt={activeOrganization.name} />
+                    <AvatarFallback className="rounded-sm">
+                      {activeOrganization.name.charAt(0)}
+                    </AvatarFallback>
+                  </Avatar>
+                ) : (
+                  <Building className="h-4 w-4" />
+                )}
+                <span>{activeOrganization?.name ?? "Organizations"}</span>
               </DropdownMenuSubTrigger>
               <DropdownMenuPortal>
                 <DropdownMenuSubContent>
@@ -118,7 +149,7 @@ export function NavUser({ user }: { user: UserResource }) {
                     <DropdownMenuItem
                       key={membership.organization.id}
                       className={activeOrganization?.id === membership.organization.id ? "bg-accent" : ""}
-                      onClick={() => setActiveOrganization(membership.organization)}
+                      onClick={() => handleOrganizationChange(membership.organization)}
                     >
                       <Avatar className="h-4 w-4 rounded-sm">
                         <AvatarImage src={membership.organization.imageUrl} alt={membership.organization.name} />
@@ -144,6 +175,6 @@ export function NavUser({ user }: { user: UserResource }) {
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>
-    </SidebarMenu>
+    </SidebarMenu >
   )
 }

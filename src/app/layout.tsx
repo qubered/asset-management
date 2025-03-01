@@ -3,6 +3,7 @@ import { ThemeProvider } from "@/components/themes/theme-provider";
 import { GeistSans } from "geist/font/sans";
 import { type Metadata } from "next";
 import { ClerkThemeWrapper } from "@/components/themes/clerk-theme-wrapper";
+import { Toaster } from "@/components/ui/sonner";
 
 export const metadata: Metadata = {
   title: "Theatre Asset Management",
@@ -23,6 +24,7 @@ export default function RootLayout({
         >
           <ClerkThemeWrapper>
             {children}
+            <Toaster />
           </ClerkThemeWrapper>
         </ThemeProvider>
       </body>
