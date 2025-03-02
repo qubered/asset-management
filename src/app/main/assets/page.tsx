@@ -1,36 +1,35 @@
-import OrgTools from "@/server/clerk/org-tools"
-import { getAssets, getModels } from "@/server/db/queries"
+import { getAssets, getModels, getLocations } from "@/server/db/queries"
+import { prepareColumnConfig } from "./_helpers/column-config"
+import { TableClientWrapper } from "./_helpers/table-client-wrapper"
 
-export default async function MainPage() {
-    const { fullName } = await OrgTools()
-    const assetsRes = await getAssets()
-    const modelsResult = await getModels()
-    
-    return (
-        <div>
-            <h1 className="text-2xl font-bold">Assets for {fullName}</h1>
-            <table>
-                <thead>
-                    <tr>
-                        <th className="border px-4 py-2">ID</th>
-                        <th className="border px-4 py-2">Name</th>
-                        <th className="border px-4 py-2">Location</th>
-                        <th className="border px-4 py-2">Category</th>
-                        <th className="border px-4 py-2">Model</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {assetsRes.map((asset) => (
-                        <tr key={asset.id}>
-                            <td className="border px-4 py-2 font-bold">{asset.id}</td>
-                            <td className="border px-4 py-2">{asset.name}</td>
-                            <td className="border px-4 py-2">{asset.location}</td>
-                            <td className="border px-4 py-2">{asset.category}</td>
-                            <td className="border px-4 py-2">{modelsResult.find((model) => model.id === asset.modelId)?.name}</td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-        </div>
-    )
-}
+// Server component to fetch data
+export default async function TablePage() {
+  const assets = await getAssets()
+  const models = await getModels()
+  
+  // Create model mapping
+  const modelMapping: Record<number, string> = {}
+  models.forEach(model => {
+    if (model.id !== null) {
+      modelMapping[model.id] = model.name ?? `Model ${model.id}`
+    }
+  })
+  const locations = await getLocations()
+  // Create enhanced assets with model names
+  const enhancedAssets = assets.map(asset => ({
+    ...asset,
+    // Add derived model name field
+    modelName: asset.modelId ? (modelMapping[asset.modelId] ?? `Model ${asset.modelId}`) : "None"
+  }))
+  
+  const columnConfig = prepareColumnConfig(modelMapping)
+
+  return (
+    <TableClientWrapper 
+      data={enhancedAssets}
+      columnConfig={columnConfig} 
+      models={models}
+      locations={locations}
+    />
+  )
+} 

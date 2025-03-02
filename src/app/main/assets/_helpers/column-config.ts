@@ -1,5 +1,5 @@
 // No "use client" directive here - this is server code
-import type { assets } from "@/server/db/schema"
+
 
 // Create a type for the model mapping
 export type ModelMapping = Record<number, string>;

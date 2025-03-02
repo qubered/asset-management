@@ -9,7 +9,7 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
   } from "@/components/ui/alert-dialog"
-  import { deleteAssetHelper } from "./deleteHelper"
+  import { deleteLocationHelper } from "@/server/db/dbHelper"
   import { useRouter } from "next/navigation"
   import { toast } from "sonner"
   export function DeleteAlertBox({ id }: { id: number }) {
@@ -24,17 +24,17 @@ import {
           <AlertDialogHeader>
             <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete your asset
-              and remove its data from our servers.
+              This action cannot be undone. This will permanently delete your location and any assets associated with it.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={async () => {
-              await deleteAssetHelper(id);
+            <AlertDialogAction className="bg-red-500 hover:bg-red-600 text-white" onClick={async () => {
+              await deleteLocationHelper(id);
+              toast.success("Location deleted successfully");
               // Refresh the table data
               router.refresh();
-              toast.success("Asset deleted successfully");
+              
             }}>Continue</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

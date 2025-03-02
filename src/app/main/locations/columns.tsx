@@ -1,7 +1,7 @@
 "use client"
  
 import { type ColumnDef } from "@tanstack/react-table"
-import type { assets } from "@/server/db/schema"
+import type { models } from "@/server/db/schema"
 import { ArrowUpDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { MoreHorizontal } from "lucide-react"
@@ -13,11 +13,13 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
   } from "@/components/ui/dropdown-menu"
-import type { ModelMapping } from "./column-config"
-import { DeleteAlertBox } from "./deleteAlertBox"
+import { DeleteAlertBox } from "./deleteModelAlertBox"
+
+// Enhanced asset type with modelName field
+
+
 // Define columns directly in this client component
-export function getColumns(modelMapping: ModelMapping = {}): ColumnDef<typeof assets.$inferSelect>[] {
-  return [
+export const columns: ColumnDef<typeof models.$inferSelect>[] = [
     {
         accessorKey: "id",
         enableResizing: false,
@@ -30,7 +32,7 @@ export function getColumns(modelMapping: ModelMapping = {}): ColumnDef<typeof as
                 variant="ghost"
                 onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
               >
-                Asset ID
+                Location ID
                 <ArrowUpDown className="ml-2 h-4 w-4" />
               </Button>
             )
@@ -42,26 +44,6 @@ export function getColumns(modelMapping: ModelMapping = {}): ColumnDef<typeof as
         enableResizing: true,
     },
     {
-        accessorKey: "location",
-        header: "Location",
-        enableResizing: true,
-    },
-    {
-        accessorKey: "category",
-        header: "Category",
-        enableResizing: true,
-    },
-    {
-        accessorKey: "modelId",
-        header: "Model",
-        enableResizing: true,
-        cell: ({ row }) => {
-            const modelId = row.original.modelId
-            if (!modelId) return "None"
-            return modelMapping[modelId] ?? `Model ${modelId}`
-        }
-    },
-    {
         id: "actions",
         header: "Actions",
         enableResizing: false,
@@ -69,7 +51,7 @@ export function getColumns(modelMapping: ModelMapping = {}): ColumnDef<typeof as
         minSize: 50,
         maxSize: 50,
         cell: ({ row }) => {
-          const asset = row.original
+          const location = row.original
      
           return (
             <div className="flex justify-center items-center">
@@ -83,13 +65,13 @@ export function getColumns(modelMapping: ModelMapping = {}): ColumnDef<typeof as
               <DropdownMenuContent align="end">
                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
                 <DropdownMenuItem
-                  onClick={() => navigator.clipboard.writeText(asset.id.toString())}
+                  onClick={() => navigator.clipboard.writeText(location.id.toString())}
                 >
-                  Copy Asset ID
+                  Copy Location ID
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                  <DeleteAlertBox id={asset.id} />
+                  <DeleteAlertBox id={location.id} />
                 </DropdownMenuItem>
                 </DropdownMenuContent>
                 </DropdownMenu>
@@ -98,4 +80,3 @@ export function getColumns(modelMapping: ModelMapping = {}): ColumnDef<typeof as
         },
     },
   ]
-}
