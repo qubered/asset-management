@@ -1,5 +1,6 @@
 import OrgTools from "@/server/clerk/org-tools"
 import { getAssets, getModels } from "@/server/db/queries"
+
 export default async function MainPage() {
     const { fullName } = await OrgTools()
     const assetsRes = await getAssets()

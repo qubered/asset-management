@@ -6,12 +6,12 @@ export default async function OrgTools() {
 
     if (!orgId) {
         const userDetails = await clerk.users.getUser(userId!) 
-        return { orgId: userId, fullName: userDetails.fullName ?? "Personal Org" }
+        return { orgId: userId, fullName: userDetails.fullName ?? "Personal Org", orgDetails: null }
     }
     else {
         const orgDetails = await clerk.organizations.getOrganization({
             organizationId: orgId
         })
-        return { orgId, fullName: orgDetails.name }
+        return { orgId, fullName: orgDetails.name, orgDetails: orgDetails }
     }
 }

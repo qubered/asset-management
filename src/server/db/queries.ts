@@ -23,12 +23,23 @@ const getAssets = async () => {
 const getModels = async () => {
     const orgId = await currentOrgId()
     if (!orgId) {
-        return []
+        return db.query.models.findMany({
+            where: eq(models.id, -1) // Return empty result if no orgId
+        })
     }
-    const returnedModels = await db.query.models.findMany({
-        where: eq(models.orgId, orgId)
+    return db.query.models.findMany({
+        where: (fields, { and, eq }) => and(
+            eq(fields.orgId, orgId)
+        )
     })
-    return returnedModels
 }
 
-export { getAssets, getModels }
+const deleteAsset = async (id: number) => {
+    const orgId = await currentOrgId()
+    if (!orgId) {
+        return
+    }
+    await db.delete(assets).where(eq(assets.id, id))
+}
+
+export { getAssets, getModels, deleteAsset }
