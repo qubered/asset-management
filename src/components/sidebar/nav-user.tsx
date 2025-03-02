@@ -3,7 +3,6 @@
 import {
   ChevronsUpDown,
   LogOut,
-  Building,
   Plus,
   User,
 } from "lucide-react"
