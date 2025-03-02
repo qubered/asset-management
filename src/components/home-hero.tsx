@@ -11,7 +11,7 @@ interface Hero32Props {
   heading?: string;
   description?: string;
   button?: {
-    text: string;
+    text: React.ReactNode | string;
     url: string;
   };
   integrations?: Integration[][];
