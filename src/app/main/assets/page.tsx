@@ -1,10 +1,7 @@
-import { db } from "@/server/db"
-import { eq } from "drizzle-orm"
-import { assets, models } from "@/server/db/schema"
 import OrgTools from "@/server/clerk/org-tools"
 import { getAssets, getModels } from "@/server/db/queries"
 export default async function MainPage() {
-    const { orgId, fullName } = await OrgTools()
+    const { fullName } = await OrgTools()
     const assetsRes = await getAssets()
     const modelsResult = await getModels()
     
