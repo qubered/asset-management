@@ -1,4 +1,4 @@
-import { Check, Database, Drama } from "lucide-react";
+import { Check, Database, Drama, Users } from "lucide-react";
 
 export default function FeatureReasons() {
     return [
@@ -16,6 +16,11 @@ export default function FeatureReasons() {
             title: "Your final Database",
             description: "Built to be your final database. No more switching between systems to manage your assets and projects.",
             icon: <Database />
+        },
+        {
+            title: "Multi-Business Support",
+            description: "Built to support multiple businesses. One Account, Multiple Businesses.",
+            icon: <Users />
         }
     ]
 }
