@@ -2,24 +2,15 @@ import { db } from "@/server/db"
 import { eq } from "drizzle-orm"
 import { assets, models } from "@/server/db/schema"
 import OrgTools from "@/server/clerk/org-tools"
-
+import { getAssets, getModels } from "@/server/db/queries"
 export default async function MainPage() {
-    const { orgId } = await OrgTools()
-
-    if (!orgId) {
-        return <div>No Organization Selected</div>
-    }
-
-    const assetsRes = await db.query.assets.findMany({
-        where: eq(assets.orgId, orgId)
-    })
-    const modelsResult = await db.query.models.findMany({
-        where: eq(models.orgId, orgId)
-    })
+    const { orgId, fullName } = await OrgTools()
+    const assetsRes = await getAssets()
+    const modelsResult = await getModels()
+    
     return (
         <div>
-            <h1 className="text-2xl font-bold">Assets</h1>
-            {orgId}
+            <h1 className="text-2xl font-bold">Assets for {fullName}</h1>
             <table>
                 <thead>
                     <tr>
