@@ -65,6 +65,8 @@ export function DashboardClient({ stats, assetsPerModel, assetsPerLocation }: Da
           <CardContent>
             <BarChart
               data={assetsPerModel}
+              index="name"
+              categories={["value"]}
               colors={["hsl(217.2, 91.2%, 59.8%)"]}
               valueFormatter={(value: number) => `${value} assets`}
               className="aspect-[1.5]"
@@ -78,6 +80,8 @@ export function DashboardClient({ stats, assetsPerModel, assetsPerLocation }: Da
           <CardContent>
             <BarChart
               data={assetsPerLocation}
+              index="name"
+              categories={["value"]}
               colors={["hsl(142.1, 76.2%, 36.3%)"]}
               valueFormatter={(value: number) => `${value} assets`}
               className="aspect-[1.5]"

@@ -1,12 +1,14 @@
 "use client"
 
-import { Bar, BarChart as RechartsBarChart, ResponsiveContainer, XAxis, YAxis, Tooltip, TooltipProps } from "recharts"
+import { Bar, BarChart as RechartsBarChart, ResponsiveContainer, XAxis, YAxis, Tooltip } from "recharts"
 
 interface BarChartProps {
   data: Array<{
     name: string
     value: number
   }>
+  index: string
+  categories: string[]
   colors: string[]
   valueFormatter: (value: number) => string
   className?: string
@@ -14,6 +16,8 @@ interface BarChartProps {
 
 export function BarChart({
   data,
+  index,
+  categories,
   colors,
   valueFormatter,
   className,
@@ -22,7 +26,7 @@ export function BarChart({
     <ResponsiveContainer width="100%" height={350} className={className}>
       <RechartsBarChart data={data}>
         <XAxis
-          dataKey="name"
+          dataKey={index}
           stroke="#888888"
           fontSize={12}
           tickLine={false}
@@ -36,7 +40,7 @@ export function BarChart({
           tickFormatter={valueFormatter}
         />
         <Tooltip 
-          content={({ active, payload, label }: TooltipProps<number, string>) => {
+          content={({ active, payload, label }) => {
             if (!active || !payload?.length) return null
             const value = payload[0]?.value
             if (typeof value !== 'number') return null
@@ -57,11 +61,14 @@ export function BarChart({
             )
           }}
         />
-        <Bar
-          dataKey="value"
-          fill={colors[0]}
-          radius={[4, 4, 0, 0]}
-        />
+        {categories.map((category, i) => (
+          <Bar
+            key={category}
+            dataKey={category}
+            fill={colors[i % colors.length]}
+            radius={[4, 4, 0, 0]}
+          />
+        ))}
       </RechartsBarChart>
     </ResponsiveContainer>
   )
