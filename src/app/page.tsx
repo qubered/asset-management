@@ -1,11 +1,9 @@
 "use client"
 import { ThemeToggle } from "@/components/themes/theme-switcher"
-import { buttonVariants } from "@/components/ui/button"
-import { Database } from "lucide-react";
-import Link from "next/link";
 import { Hero32 } from "@/components/home-hero";
 import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
-
+import { Feature43 } from "@/components/home-featured";
+import FeatureReasons from "./feature-reasons";
 export default function HomePage() {
   return (
     <main className="">
@@ -26,6 +24,9 @@ export default function HomePage() {
           </SignedOut>
         </>
       ), url: "/main" }} />
+      <div className="flex flex-col gap-4 items-center justify-center">
+        <Feature43 heading="Why Us?" reasons={FeatureReasons()} />
+      </div>
     </main>
   );
 }
