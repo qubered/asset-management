@@ -59,6 +59,23 @@ export const columns: ColumnDef<EnhancedAsset>[] = [
         enableResizing: true,
     },
     {
+        accessorKey: "createdAt",
+        header: "Created At",
+        enableResizing: true,
+        cell: ({ row }) => {
+            const createdAt = row.original.createdAt
+            const formattedDate = createdAt.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+            })
+            return formattedDate
+        }
+
+    },
+    {
         id: "actions",
         header: "Actions",
         enableResizing: false,
