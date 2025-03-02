@@ -13,7 +13,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
   } from "@/components/ui/dropdown-menu"
-import { ModelMapping } from "./column-config"
+import type { ModelMapping } from "./column-config"
 import { DeleteAlertBox } from "./deleteAlertBox"
 // Define columns directly in this client component
 export function getColumns(modelMapping: ModelMapping = {}): ColumnDef<typeof assets.$inferSelect>[] {
@@ -58,7 +58,7 @@ export function getColumns(modelMapping: ModelMapping = {}): ColumnDef<typeof as
         cell: ({ row }) => {
             const modelId = row.original.modelId
             if (!modelId) return "None"
-            return modelMapping[modelId] || `Model ${modelId}`
+            return modelMapping[modelId] ?? `Model ${modelId}`
         }
     },
     {

@@ -3,6 +3,8 @@ import { getAssets, getModels } from "@/server/db/queries"
 import { prepareColumnConfig } from "./column-config"
 import { TableClientWrapper } from "./table-client-wrapper"
 import { Button } from "@/components/ui/button"
+import { NewDialog } from "@/components/newDialog"
+import { Input } from "@/components/ui/input"  
 
 async function getData() {
   const assets = await getAssets()
@@ -29,7 +31,12 @@ export default async function TablePage() {
     <div className="container mx-auto py-10">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-bold">Assets</h1>
-        <Button>Add Asset</Button>
+        <NewDialog title="Add Asset" trigger={<Button>Add Asset</Button>}>
+          <Input type="text" placeholder="Asset Name" />
+          <Input type="text" placeholder="Asset Location" />
+          <Input type="text" placeholder="Asset Category" />
+          <Input type="text" placeholder="Asset Model" />
+        </NewDialog>
       </div>
       <TableClientWrapper data={assets} columnConfig={columnConfig} />
     </div>
