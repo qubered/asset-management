@@ -38,7 +38,7 @@ const data = {
         },
         {
           title: "Locations",
-          url: "#",
+          url: "/main/locations",
         },
       ],
     },

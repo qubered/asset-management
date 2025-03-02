@@ -68,3 +68,19 @@ export const models = createTable(
     ),
   }
 );
+
+export const locations = createTable(
+  "locations",
+  {
+    id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
+    orgId: varchar("org_id", { length: 256 }),
+    name: varchar("name", { length: 256 }),
+    parentId: integer("parent_id"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).$onUpdate(
+      () => new Date()
+    ),
+  }
+);
