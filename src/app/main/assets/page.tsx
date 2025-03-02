@@ -1,12 +1,13 @@
 import { db } from "@/server/db"
-import { auth } from '@clerk/nextjs/server'
 import { eq } from "drizzle-orm"
 import { assets, models } from "@/server/db/schema"
+import OrgTools from "@/server/clerk/org-tools"
 
 export default async function MainPage() {
-    const { orgId } = await auth()
+    const { orgId } = await OrgTools()
+
     if (!orgId) {
-        return <div>No organization selected</div>
+        return <div>No Organization Selected</div>
     }
 
     const assetsRes = await db.query.assets.findMany({

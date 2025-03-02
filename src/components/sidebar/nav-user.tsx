@@ -5,6 +5,7 @@ import {
   LogOut,
   Building,
   Plus,
+  User,
 } from "lucide-react"
 
 import {
@@ -110,7 +111,11 @@ export function NavUser({ user }: { user: UserResource }) {
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuSub>
-              <DropdownMenuSubTrigger onClick={() => openOrganizationProfile()}>
+              <DropdownMenuSubTrigger onClick={() => {
+                if (organization) {
+                  openOrganizationProfile()
+                }
+              }}>
                 {organization ? (
                   <Avatar className="h-4 w-4 rounded-sm">
                     <AvatarImage src={organization.imageUrl} alt={organization.name} />
@@ -119,9 +124,9 @@ export function NavUser({ user }: { user: UserResource }) {
                     </AvatarFallback>
                   </Avatar>
                 ) : (
-                  <Building className="h-4 w-4" />
+                  <User className="h-4 w-4" />
                 )}
-                <span>{organization?.name ?? "Organizations"}</span>
+                <span>{organization?.name ?? "Personal Org"}</span>
               </DropdownMenuSubTrigger>
               <DropdownMenuPortal>
                 <DropdownMenuSubContent>
@@ -145,6 +150,16 @@ export function NavUser({ user }: { user: UserResource }) {
                       {membership.organization.name}
                     </DropdownMenuItem>
                   ))}
+                  <DropdownMenuItem onClick={() => (
+                      setActive({ organization: null }),
+                      toast.success(`Changed Organization`, {
+                        description: `You are now in Personal Org`
+                      })
+                      )}>
+                    <User className="h-4 w-4" />
+                    Personal Org
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={() => openCreateOrganization()}>
                     <Plus className="h-4 w-4" />
                     Create New Organization
