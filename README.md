@@ -1,12 +1,5 @@
-# Asset Management
-A better name is yet to be decided
+# Asset Manager.
+Real name to be created at some point
 
-Theatre Focused Asset Management System
-
-## Built with T3 Stack
-
-- Next.js
-- Tailwind CSS
-- Shadcn UI
-- Clerk
-- Drizzle
+## TODO
+[ ] Refactor code to be less messy
