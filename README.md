@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Asset Management
 A better name is yet to be decided
 
@@ -11,7 +10,3 @@ Theatre Focused Asset Management System
 - Shadcn UI
 - Clerk
 - Drizzle
-=======
-# Asset Manager.
-Real name to be created at some point
->>>>>>> main
