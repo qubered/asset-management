@@ -4,6 +4,7 @@ import { GeistSans } from "geist/font/sans";
 import { type Metadata } from "next";
 import { ClerkThemeWrapper } from "@/components/themes/clerk-theme-wrapper";
 import { Toaster } from "@/components/ui/sonner";
+import { ConvexClientProvider } from "./ConvexClientProvider";
 
 export const metadata: Metadata = {
   title: "Theatre Asset Management",
@@ -23,7 +24,7 @@ export default function RootLayout({
           enableSystem
         >
           <ClerkThemeWrapper>
-            {children}
+            <ConvexClientProvider>{children}</ConvexClientProvider>
             <Toaster />
           </ClerkThemeWrapper>
         </ThemeProvider>
