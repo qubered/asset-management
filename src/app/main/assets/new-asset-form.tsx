@@ -1,10 +1,9 @@
 "use client"
 
-import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
-import { z } from "zod"
-import { locations, type models } from "@/server/db/schema"
-
+import { zodResolver } from "@hookform/resolvers/zod"
+import { z } from "zod";
+import { GetCategories, GetModels, GetLocations, GetID } from "@/server/convex/dbHelper";
 import { Button } from "@/components/ui/button"
 import {
   Form,
@@ -16,251 +15,201 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import {
-    Command,
-    CommandEmpty,
-    CommandGroup,
-    CommandInput,
-    CommandItem,
-    CommandList,
-  } from "@/components/ui/command"
-  import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-  } from "@/components/ui/popover"
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
-import { createAssetHelper } from "@/server/db/dbHelper"
-import { toast } from "sonner"
-import { Check } from "lucide-react"
-import { ChevronsUpDown } from "lucide-react"
-import { cn } from "@/lib/utils"
+import { toast } from "sonner";
+import { useMutation } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import type { Id } from "@/convex/_generated/dataModel";
+
+
 const formSchema = z.object({
-  assetName: z.string().min(2, {
-    message: "Asset name must be at least 2 characters.",
-  }),
-  assetLocation: z.string().min(1, {
-    message: "Asset location must be selected.",
-  }),
-  assetCategory: z.string().min(2, {
-    message: "Asset category must be at least 2 characters.",
-  }),
-  assetModel: z.number().min(1, {
-    message: "Asset model must be selected.",
-  }),
+  assetTag: z.string(),
+  name: z.optional(z.string()),
+  serielNumber: z.optional(z.string()),
+  model: z.custom<Id<"models">>(),
+  category: z.custom<Id<"categories">>(),
+  currentLocation: z.custom<Id<"locations">>(),
+  defaultLocation: z.custom<Id<"locations">>(),
+  notes: z.optional(z.string()),
+  ownerID: z.string(),
 })
 
-const languages = [
-    { label: "English", value: "en" },
-    { label: "French", value: "fr" },
-    { label: "German", value: "de" },
-    { label: "Spanish", value: "es" },
-    { label: "Portuguese", value: "pt" },
-    { label: "Russian", value: "ru" },
-    { label: "Japanese", value: "ja" },
-    { label: "Korean", value: "ko" },
-    { label: "Chinese", value: "zh" },
-  ] as const
+export function AssetForm() {
+  const categories = GetCategories();
+  const models = GetModels();
+  const locations = GetLocations();
+  const currentID = GetID();
 
-// Create a function that will be used in the component
-async function submitFormData(
-  data: z.infer<typeof formSchema>, 
-  locationsList: typeof locations.$inferSelect[],
-  onSuccess?: () => void
-) {
-  try {
-    const selectedLocation = locationsList.find(loc => loc.id.toString() === data.assetLocation);
-    const mappedData = {
-      name: data.assetName,
-      location: selectedLocation?.name ?? "",
-      category: data.assetCategory,
-      modelId: data.assetModel
-    };
-    await createAssetHelper(mappedData);
-    toast.success("Asset created successfully");
-    
-    if (onSuccess) {
-      onSuccess();
-    }
-  } catch (error) {
-    toast.error("Failed to create asset");
-    console.error(error);
-  }
-}
+  const createAsset = useMutation(api.assets.create);
 
-interface NewAssetFormProps {
-  onSuccess?: () => void;
-  models: typeof models.$inferSelect[];
-  locations: typeof locations.$inferSelect[];
-}
 
-export function NewAssetForm({ onSuccess, models, locations }: NewAssetFormProps) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      assetName: "",
-      assetLocation: "",
-      assetCategory: "",
-      assetModel: 0,
+      assetTag: "",
+      name: "",
+      serielNumber: "",
+      model: "",
+      category: "",
+      currentLocation: "",
+      defaultLocation: "",
+      notes: "",
+      ownerID: currentID ?? "",
     },
   })
 
-  const handleFormSubmit = async (data: z.infer<typeof formSchema>) => {
-    await submitFormData(data, locations, onSuccess);
-  };
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    try {
+      await createAsset({
+        assetTag: values.assetTag,
+        name: values.name ?? "",
+        serielNumber: values.serielNumber ?? "",
+        model: values.model,
+        category: values.category,
+        currentLocation: values.currentLocation,
+        defaultLocation: values.defaultLocation,
+        ownerID: currentID ?? "",
+      });
+      toast.success("Asset created successfully");
+    } catch (error) {
+      toast.error("Failed to create asset");
+      console.error(error);
+    }
+  }
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-8">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
         <FormField
           control={form.control}
-          name="assetName"
+          name="assetTag"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Asset Name</FormLabel>
+              <FormLabel>Asset Tag</FormLabel>
               <FormControl>
-                <Input placeholder="Asset Name" {...field} />
+                <Input placeholder="Asset Tag" {...field} />
               </FormControl>
+              <FormDescription>
+                Asset tag is a unique identifier for the asset.
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
-        
         <FormField
           control={form.control}
-          name="assetLocation"
-          render={({ field }) => (
-            <FormItem className="flex flex-col">
-              <FormLabel>Location</FormLabel>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <FormControl>
-                    <Button
-                      variant="outline"
-                      role="combobox"
-                      className={cn(
-                        "w-[200px] justify-between",
-                        !field.value && "text-muted-foreground"
-                      )}
-                    >
-                      {field.value
-                        ? (locations ?? []).find(
-                            (location) => location.id.toString() === field.value
-                          )?.name
-                        : "Select location"}
-                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                    </Button>
-                  </FormControl>
-                </PopoverTrigger>
-                <PopoverContent className="w-[200px] p-0">
-                  <Command>
-                    <CommandInput placeholder="Search location..." />
-                    <CommandList>
-                      <CommandEmpty>No location found.</CommandEmpty>
-                      <CommandGroup>
-                        {(locations ?? []).map((location) => (
-                          <CommandItem
-                            value={location.name ?? `Location ${location.id}`}
-                            key={location.id}
-                            onSelect={() => {
-                              form.setValue("assetLocation", location.id.toString())
-                            }}
-                          >
-                            {location.name ?? `Location ${location.id}`}
-                            <Check
-                              className={cn(
-                                "ml-auto",
-                                location.id.toString() === field.value
-                                  ? "opacity-100"
-                                  : "opacity-0"
-                              )}
-                            />
-                          </CommandItem>
-                        ))}
-                      </CommandGroup>
-                    </CommandList>
-                  </Command>
-                </PopoverContent>
-              </Popover>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        
-        <FormField
-          control={form.control}
-          name="assetCategory"
+          name="category"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Category</FormLabel>
-              <FormControl>
-                <Input placeholder="Asset Category" {...field} />
-              </FormControl>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a category" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {categories?.map((category) => (
+                    <SelectItem key={category._id} value={category._id}>
+                      {category.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormDescription>
+                Name is the name of the asset.
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
-        
         <FormField
           control={form.control}
-          name="assetModel"
+          name="model"
           render={({ field }) => (
-            <FormItem className="flex flex-col">
+            <FormItem>
               <FormLabel>Model</FormLabel>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <FormControl>
-                    <Button
-                      variant="outline"
-                      role="combobox"
-                      className={cn(
-                        "w-[200px] justify-between",
-                        !field.value && "text-muted-foreground"
-                      )}
-                    >
-                      {field.value
-                        ? models.find(
-                            (model) => model.id === field.value
-                          )?.name
-                        : "Select model"}
-                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                    </Button>
-                  </FormControl>
-                </PopoverTrigger>
-                <PopoverContent className="w-[200px] p-0">
-                  <Command>
-                    <CommandInput placeholder="Search model..." />
-                    <CommandList>
-                      <CommandEmpty>No model found.</CommandEmpty>
-                      <CommandGroup>
-                        {models.map((model) => (
-                          <CommandItem
-                            value={model.name ?? `Model ${model.id}`}
-                            key={model.id}
-                            onSelect={() => {
-                              form.setValue("assetModel", model.id)
-                            }}
-                          >
-                            {model.name ?? `Model ${model.id}`}
-                            <Check
-                              className={cn(
-                                "ml-auto",
-                                model.id === field.value
-                                  ? "opacity-100"
-                                  : "opacity-0"
-                              )}
-                            />
-                          </CommandItem>
-                        ))}
-                      </CommandGroup>
-                    </CommandList>
-                  </Command>
-                </PopoverContent>
-              </Popover>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a model" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {models?.map((model) => (
+                    <SelectItem key={model._id} value={model._id}>
+                      {model.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormDescription>
+                Name is the name of the asset.
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
-        
+        <FormField
+          control={form.control}
+          name="currentLocation"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Current Location</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a current location" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {locations?.map((location) => (
+                    <SelectItem key={location._id} value={location._id}>
+                      {location.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormDescription>
+                Name is the name of the asset.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="defaultLocation"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Default Location</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a default location" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {locations?.map((location) => (
+                    <SelectItem key={location._id} value={location._id}>
+                      {location.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormDescription>
+                Name is the name of the asset.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
         <Button type="submit">Submit</Button>
       </form>
     </Form>

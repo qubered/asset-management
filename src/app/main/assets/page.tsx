@@ -1,35 +1,21 @@
-import { getAssets, getModels, getLocations } from "@/server/db/queries"
-import { prepareColumnConfig } from "./_helpers/column-config"
-import { TableClientWrapper } from "./_helpers/table-client-wrapper"
+"use client";
 
-// Server component to fetch data
-export default async function TablePage() {
-  const assets = await getAssets()
-  const models = await getModels()
-  
-  // Create model mapping
-  const modelMapping: Record<number, string> = {}
-  models.forEach(model => {
-    if (model.id !== null) {
-      modelMapping[model.id] = model.name ?? `Model ${model.id}`
-    }
-  })
-  const locations = await getLocations()
-  // Create enhanced assets with model names
-  const enhancedAssets = assets.map(asset => ({
-    ...asset,
-    // Add derived model name field
-    modelName: asset.modelId ? (modelMapping[asset.modelId] ?? `Model ${asset.modelId}`) : "None"
-  }))
-  
-  const columnConfig = prepareColumnConfig(modelMapping)
-
+import { columns } from "./columns";
+import { DataTable } from "@/components/data-table";
+import { GetAssets, GetID, GetLastAsset } from "@/server/convex/dbHelper";
+import { AssetForm } from "./new-asset-form";
+export default function Home() {
+  const assets = GetAssets();
+  const lastAsset = GetLastAsset();
+  const orgID = GetID();
   return (
-    <TableClientWrapper 
-      data={enhancedAssets}
-      columnConfig={columnConfig} 
-      models={models}
-      locations={locations}
-    />
-  )
-} 
+    <div>
+      <h1>Assets: {orgID}</h1>
+      <p>Latest: {lastAsset?.assetTag}</p>
+      <DataTable columns={columns} data={assets ?? []} />
+      <div>
+        <AssetForm />
+      </div>
+    </div>
+  );
+}
