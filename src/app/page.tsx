@@ -1,9 +1,9 @@
 "use client"
 import { ThemeToggle } from "@/components/themes/theme-switcher"
-import { Hero32 } from "@/components/home-hero";
+import { Hero32 } from "@/app/_components/home-hero";
 import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
-import { Feature43 } from "@/components/home-featured";
-import FeatureReasons from "./feature-reasons";
+import { Feature43 } from "@/app/_components/home-featured";
+import FeatureReasons from "./_components/feature-reasons";
 import { Separator } from "@/components/ui/separator";
 export default function HomePage() {
   return (
